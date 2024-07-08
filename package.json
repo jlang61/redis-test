@@ -10,6 +10,7 @@
     "test": "ts-node loadTest.ts"
   },
   "dependencies": {
+    "express": "^4.19.2",
     "redis": "^4.6.15",
     "ws": "^7.5.10"
   },
