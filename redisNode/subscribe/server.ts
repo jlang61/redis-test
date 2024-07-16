@@ -11,10 +11,9 @@ import { createClient } from 'redis';
     console.log(message); // 'message'
   });
 
-  // Optional: handle cleanup if needed
-  // process.on('SIGINT', async () => {
-  //   await subscriber.unsubscribe('article');
-  //   await subscriber.quit();
-  //   process.exit();
-  // });
+  process.on('SIGINT', async () => {
+    await subscriber.unsubscribe('article');
+    await subscriber.quit();
+    process.exit();
+  });
 })();

@@ -5,8 +5,7 @@ import { createClient } from 'redis';
 
   const article = {
     id: '123456',
-    name: 'Using Redis Pub/Sub with Node.js',
-    blog: 'Logrocket Blog',
+    name: 'Testing publish',
   };
 
   await publisher.connect();
