@@ -27,7 +27,7 @@ This repository contains a simple implementation of Redis Pub/Sub using Node.js 
 
 ## Folder Structure
 
-`
+
 ├── redisNode \
 │   ├── publish \
 │   │   └── publisher.ts \
@@ -36,7 +36,7 @@ This repository contains a simple implementation of Redis Pub/Sub using Node.js 
 ├── package.json \
 ├── tsconfig.json \
 └── README.md \
-`
+
 
 ## Running the Code
 
