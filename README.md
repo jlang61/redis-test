@@ -48,13 +48,9 @@ The publisher publishes an article message to the Redis channel named `article`.
     
     `cd redisNode/publish` 
     
-2.  **Compile the TypeScript file:**
+2.  **Compile and run the TypeScript file:**
     
-    `npx tsc publisher.ts` 
-    
-3.  **Run the compiled JavaScript file:**
-    
-    `node publisher.js` 
+    `npm start` 
     
 
 ### Subscriber
@@ -65,10 +61,7 @@ The subscriber listens to the Redis channel named `article` and logs any receive
     
     `cd redisNode/subscribe` 
     
-2.  **Compile the TypeScript file:**
+2.  **Compile and run the TypeScript file:**
     
-    `npx tsc subscriber.ts` 
+    `npm start` 
     
-3.  **Run the compiled JavaScript file:**
-    
-     `node subscriber.js`
