@@ -63,5 +63,12 @@ The subscriber listens to the Redis channel named `article` and logs any receive
     
 2.  **Compile and run the TypeScript file:**
     
-    `npm start` 
+    `npm start`
+
+
+### Publish Message:
+
+1. **To Publish a Message**
+
+   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": id_number, "name": message}'`
     
