@@ -4,7 +4,7 @@ import path from 'path';
 const numberOfClients = 5; 
 
 for (let i = 0; i < numberOfClients; i++) {
-  const clientPath = path.resolve(__dirname, 'testclient.ts');
+  const clientPath = path.resolve(__dirname, 'init-message.ts');
   const clientProcess = fork(clientPath);
 
   clientProcess.on('message', (message) => {
