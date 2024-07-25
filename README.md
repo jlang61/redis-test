@@ -70,5 +70,26 @@ The subscriber listens to the Redis channel named `article` and logs any receive
 
 1. **To Publish a Message**
 
-   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": id_number, "name": message}'`
+   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": 1234, "name": "Hello World!"}'`
+
+
+### Testing:
+
+1.  **Navigate to the subscribe directory:**
+    
+    `cd redisNode/test` 
+    
+2. **Test Clients are being connected**
+
+   `npm run client`
+   
+4. **Test Messages are being Ran**
+
+   `npm run message`
+
+   *Then in a separate console*
+   
+   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": 1234, "name": "Hello World!"}'`
+
+   
     
