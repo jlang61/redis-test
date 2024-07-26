@@ -23,6 +23,8 @@ const broadcastMessage = (message: string) => {
     });
 };
 
+// per alexey's request to be able to broadcast message to all connected clients when a new client connects
+
 wss.on('connection', (ws: WebSocket) => {
     wsClients.add(ws);
     console.log('WebSocket added');
@@ -70,6 +72,7 @@ app.post('/publish', async (req: Request, res: Response) => {
 
     try {
         const publisher = await connectToRedis();
+        // article is the 'key' that tells you which channel to publish to 
         await publisher.publish('article', JSON.stringify(article));
         await publisher.quit();
 

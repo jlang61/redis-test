@@ -17,6 +17,15 @@ let wsClients: Set<WebSocket> = new Set();
 
 wss.on('connection', (ws) => {
   wsClients.add(ws);
+
+  ws.on('message', async (message) => {
+    console.log('Received message from WebSocket client:', message.toString());
+    
+    const publisher = await connectToRedis();
+    await publisher.publish('ws-messages', message.toString());
+    await publisher.quit();
+  });
+
   ws.on('close', () => {
     wsClients.delete(ws);
   });
@@ -50,7 +59,17 @@ const startListener = async () => {
       });
     });
 
-    console.log('Listening for articles on the "article" channel...');
+    subscriber.subscribe('ws-messages', (message) => {
+      console.log('Received message from Redis channel ws-messages:', message);
+
+      wsClients.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+          client.send(message);
+        }
+      });
+    });
+
+    console.log('Listening for articles and WebSocket messages on the respective channels...');
   } catch (error) {
     console.error('Failed to start listener:', error);
   }
