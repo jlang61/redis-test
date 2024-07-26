@@ -13,6 +13,13 @@ for (let i = 0; i < numberOfClients; i++) {
 
   ws.on('open', () => {
     console.log(`Client ${i + 1} connected`);
+
+    // Send a test message to the server
+    ws.send(JSON.stringify({ message: `Hello from client ${i + 1}` }));
+  });
+
+  ws.on('message', (data) => {
+    console.log(`Client ${i + 1} received message: ${data}`);
   });
 
   ws.on('close', () => {

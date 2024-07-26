@@ -15,10 +15,29 @@ const wss = new WebSocketServer({ server });
 
 const wsClients: Set<WebSocket> = new Set();
 
+const broadcastMessage = (message: string) => {
+    wsClients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+};
+
 wss.on('connection', (ws: WebSocket) => {
     wsClients.add(ws);
+    console.log('WebSocket added');
+    broadcastMessage('A client connected');
+
+    ws.on('message', async (message) => {
+        console.log('Received message from client:', message.toString());
+        const publisher = await connectToRedis();
+        await publisher.publish('ws-messages', message.toString());
+        await publisher.quit();
+    });
+    
     ws.on('close', () => {
         wsClients.delete(ws);
+        broadcastMessage('A client disconnected');
     });
 });
 
@@ -33,6 +52,14 @@ const connectToRedis = async (): Promise<MyRedisClient> => {
         console.error('Failed to connect to Redis:', error);
         throw error;
     }
+};
+
+const initRedisSubscriber = async () => {
+    const subscriber = await connectToRedis();
+    await subscriber.subscribe('ws-messages', (message) => {
+        console.log('Broadcasting message from Redis:', message);
+        broadcastMessage(message);
+    });
 };
 
 app.post('/publish', async (req: Request, res: Response) => {
@@ -58,6 +85,7 @@ app.post('/publish', async (req: Request, res: Response) => {
         res.status(500).send('Error publishing article');
     }
 });
+
 app.get('/clients', (req: Request, res: Response) => {
     const clientInfo = Array.from(wsClients).map((client, index) => ({
         id: index + 1,
@@ -66,6 +94,7 @@ app.get('/clients', (req: Request, res: Response) => {
     res.status(200).json(clientInfo);
 });
 
-server.listen(port, () => {
+server.listen(port, async () => {
     console.log(`Server is running on http://localhost:${port}`);
+    await initRedisSubscriber();
 });
