@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node server.ts",
-    "test": "ts-node test.ts"
+    "server": "ts-node server.ts",
+    "listener": "ts-node listener.ts"
   },
   "keywords": [],
   "author": "",

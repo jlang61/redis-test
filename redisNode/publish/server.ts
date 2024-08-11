@@ -28,7 +28,7 @@ const broadcastMessage = (message: string) => {
 wss.on('connection', (ws: WebSocket) => {
     wsClients.add(ws);
     console.log('WebSocket added');
-    broadcastMessage('A client connected');
+    // broadcastMessage('A client connected');
 
     ws.on('message', async (message) => {
         console.log('Received message from client:', message.toString());
@@ -39,7 +39,7 @@ wss.on('connection', (ws: WebSocket) => {
     
     ws.on('close', () => {
         wsClients.delete(ws);
-        broadcastMessage('A client disconnected');
+        // broadcastMessage('A client disconnected');
     });
 });
 
@@ -60,7 +60,7 @@ const initRedisSubscriber = async () => {
     const subscriber = await connectToRedis();
     await subscriber.subscribe('ws-messages', (message) => {
         console.log('Broadcasting message from Redis:', message);
-        broadcastMessage(message);
+        // broadcastMessage(message);
     });
 };
 
