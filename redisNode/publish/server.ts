@@ -2,11 +2,17 @@ import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { createClient, RedisClientType, RedisModules, RedisFunctions, RedisScripts } from 'redis';
+import commandLineArgs from 'command-line-args';
 
 interface MyRedisClient extends RedisClientType<RedisModules, RedisFunctions, RedisScripts> { }
 
+const optionDefinitions = [
+    { name: 'port', alias: 'p', type: Number }
+]
+const options = commandLineArgs(optionDefinitions)
+const port = options['port'];
+
 const app = express();
-const port = 3000;
 
 app.use(express.json());
 
@@ -24,6 +30,7 @@ const broadcastMessage = (message: string) => {
 };
 
 // per alexey's request to be able to broadcast message to all connected clients when a new client connects
+let publisher: MyRedisClient | undefined
 
 wss.on('connection', (ws: WebSocket) => {
     wsClients.add(ws);
@@ -32,9 +39,9 @@ wss.on('connection', (ws: WebSocket) => {
 
     ws.on('message', async (message) => {
         console.log('Received message from client:', message.toString());
-        const publisher = await connectToRedis();
-        await publisher.publish('ws-messages', message.toString());
-        await publisher.quit();
+        
+        await publisher?.publish('ws-messages', message.toString());
+        // await publisher.quit();
     });
     
     ws.on('close', () => {
@@ -60,7 +67,7 @@ const initRedisSubscriber = async () => {
     const subscriber = await connectToRedis();
     await subscriber.subscribe('ws-messages', (message) => {
         console.log('Broadcasting message from Redis:', message);
-        // broadcastMessage(message);
+        broadcastMessage(message);
     });
 };
 
@@ -100,4 +107,5 @@ app.get('/clients', (req: Request, res: Response) => {
 server.listen(port, async () => {
     console.log(`Server is running on http://localhost:${port}`);
     await initRedisSubscriber();
+    publisher = await connectToRedis() 
 });
