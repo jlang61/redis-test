@@ -38,10 +38,21 @@ wss.on('connection', (ws: WebSocket) => {
     // broadcastMessage('A client connected');
 
     ws.on('message', async (message) => {
-        console.log('Received message from client:', message.toString());
+        var splitted = message.toString().split("~", 2)
+        // check if we need to split into a differnet channel
+        if (splitted.length == 2){
+            var channel = splitted[0]
+            var mes = splitted[1]
+            console.log('Received message from client:', mes);
+            await publisher?.publish(channel, mes);
+        }
+        else{
+            console.log('Received message from client:', message.toString());
         
-        await publisher?.publish('ws-messages', message.toString());
-        // await publisher.quit();
+            await publisher?.publish('all', message.toString());
+            // await publisher.quit();
+        }
+
     });
     
     ws.on('close', () => {
@@ -65,7 +76,7 @@ const connectToRedis = async (): Promise<MyRedisClient> => {
 
 const initRedisSubscriber = async () => {
     const subscriber = await connectToRedis();
-    await subscriber.subscribe('ws-messages', (message) => {
+    await subscriber.subscribe('all', (message) => {
         console.log('Broadcasting message from Redis:', message);
         broadcastMessage(message);
     });
