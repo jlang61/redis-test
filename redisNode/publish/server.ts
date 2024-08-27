@@ -28,46 +28,6 @@ const broadcastMessage = (message: string) => {
         }
     });
 };
-
-// per alexey's request to be able to broadcast message to all connected clients when a new client connects
-let publisher: MyRedisClient | undefined
-
-wss.on('connection', (ws: WebSocket) => {
-    wsClients.add(ws);
-    console.log('WebSocket added');
-    // broadcastMessage('A client connected');
-    var channel = ""
-    var mes = ""
-    ws.on('message', async (message) => {
-        var splitted = message.toString().split(" ", 2)
-        // check if we need to split into a differnet channel
-        if (splitted[0].toLowerCase() == 'subscribe'){
-            channel = splitted[1].toLowerCase()
-        }
-        else if (splitted[0].toLowerCase() == 'send' && channel != ""){
-            mes = splitted[1]
-            await publisher?.publish(channel, mes);
-        }
-        else if (splitted[0].toLowerCase() == 'unsubscribe'){
-            channel = ""
-        }
-        console.log("Current Channel: ", channel, "\n Current Message: ", mes);
-
-        // else{
-        //     console.log('Received message from client:', message.toString());
-        
-        //     await publisher?.publish('all', message.toString());
-        //     // await publisher.quit();
-        // }
-
-    });
-    
-    ws.on('close', () => {
-        wsClients.delete(ws);
-        // broadcastMessage('A client disconnected');
-    });
-});
-
 const connectToRedis = async (): Promise<MyRedisClient> => {
     try {
         const client = createClient({
@@ -121,9 +81,70 @@ app.get('/clients', (req: Request, res: Response) => {
     }));
     res.status(200).json(clientInfo);
 });
+// per alexey's request to be able to broadcast message to all connected clients when a new client connects
+let publisher: MyRedisClient | undefined
+
+wss.on('connection', async (ws: WebSocket) => {
+    wsClients.add(ws);
+    console.log('WebSocket added');
+
+    let channel: string[] = [];
+    let subscriber: MyRedisClient | undefined;
+
+    ws.on('message', async (message) => {
+        const splitted = message.toString().split(" ", 3);
+        const command = splitted[0].toLowerCase();
+        const channelName = splitted[1]?.toLowerCase();
+        
+        if (command === 'subscribe' && channelName) {
+            if (!subscriber) {
+                subscriber = await connectToRedis();
+            }
+
+            if (!channel.includes(channelName)) {
+                channel.push(channelName);
+                await subscriber.subscribe(channelName, (redisMessage) => {
+                    console.log(`Broadcasting message from Redis channel '${channelName}':`, redisMessage);
+                    ws.send(redisMessage);
+                });
+                console.log(`Subscribed to channel '${channelName}'`);
+            }
+        } 
+        else if (command === 'send' && channel.includes(channelName)) {
+            const mes = splitted[2];
+            if (mes && publisher) {
+                await publisher.publish(channelName, mes);
+                console.log(`Published message to channel '${channelName}': ${mes}`);
+            }
+        } 
+        else if (command === 'unsubscribe' && channelName) {
+            const index = channel.indexOf(channelName);
+            if (index > -1) {
+                channel.splice(index, 1);
+                await subscriber?.unsubscribe(channelName);
+                console.log(`Unsubscribed from channel '${channelName}'`);
+            }
+        }
+
+        console.log("Current Channels: ", channel);
+    });
+
+    ws.on('close', async () => {
+        wsClients.delete(ws);
+        if (subscriber) {
+            for (const ch of channel) {
+                await subscriber.unsubscribe(ch);
+            }
+            await subscriber.quit();
+        }
+        console.log('WebSocket closed and unsubscribed from all channels');
+    });
+});
+
+
 
 server.listen(port, async () => {
     console.log(`Server is running on http://localhost:${port}`);
     await initRedisSubscriber();
-    publisher = await connectToRedis() 
+    publisher = await connectToRedis()
 });
