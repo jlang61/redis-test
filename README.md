@@ -51,7 +51,8 @@ The publisher publishes an article message to the Redis channel named `article`.
 2.  **Compile and run the TypeScript file:**
     
     `npm start` 
-    
+
+    * NOTE: Using ~ in a string will be able to specify which channel to publish to. channel~message
 
 ### Subscriber
 
