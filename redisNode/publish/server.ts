@@ -36,22 +36,29 @@ wss.on('connection', (ws: WebSocket) => {
     wsClients.add(ws);
     console.log('WebSocket added');
     // broadcastMessage('A client connected');
-
+    var channel = ""
+    var mes = ""
     ws.on('message', async (message) => {
-        var splitted = message.toString().split("~", 2)
+        var splitted = message.toString().split(" ", 2)
         // check if we need to split into a differnet channel
-        if (splitted.length == 2){
-            var channel = splitted[0]
-            var mes = splitted[1]
-            console.log('Received message from client:', mes);
+        if (splitted[0].toLowerCase() == 'subscribe'){
+            channel = splitted[1].toLowerCase()
+        }
+        else if (splitted[0].toLowerCase() == 'send' && channel != ""){
+            mes = splitted[1]
             await publisher?.publish(channel, mes);
         }
-        else{
-            console.log('Received message from client:', message.toString());
-        
-            await publisher?.publish('all', message.toString());
-            // await publisher.quit();
+        else if (splitted[0].toLowerCase() == 'unsubscribe'){
+            channel = ""
         }
+        console.log("Current Channel: ", channel, "\n Current Message: ", mes);
+
+        // else{
+        //     console.log('Received message from client:', message.toString());
+        
+        //     await publisher?.publish('all', message.toString());
+        //     // await publisher.quit();
+        // }
 
     });
     
