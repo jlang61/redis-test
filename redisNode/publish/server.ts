@@ -104,7 +104,6 @@ wss.on('connection', async (ws: WebSocket) => {
             if (!channel.includes(channelName)) {
                 channel.push(channelName);
                 await subscriber.subscribe(channelName, (redisMessage) => {
-                    console.log(`Broadcasting message from Redis channel '${channelName}':`, redisMessage);
                     ws.send(redisMessage);
                 });
                 console.log(`Subscribed to channel '${channelName}'`);
