@@ -1,7 +1,7 @@
 
 # Redis Pub/Sub Testing
 
-This repository contains a simple implementation of Redis Pub/Sub using Node.js with TypeScript. The publish and subscribe functionality is located under `redisNode/publish` and `redisNode/subscribe` respectively.
+This repository contains a simple implementation of Redis Pub/Sub for WebSockets using Node.js with TypeScript. This is meant to circumvent the issue of multiple servers to transfer information and introduce scalability.
 
 ## Prerequisites
 
