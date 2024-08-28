@@ -38,20 +38,18 @@ This repository contains a simple implementation of Redis Pub/Sub using Node.js 
 
 ### Starting server
 
-    `yarn start -p 3000`
+    yarn start -p 3000
 
-### Connect Websocket to Server
-
-    *in a separate terminal*
+### Connect Websocket to Server (in a separate terminal)
     
-    `yarn wscat -c ws://localhost:3000/v1/ws`
+    yarn wscat -c ws://localhost:3000/v1/ws
 
 ### Commands for Websocket 
 
-    `subscribe [channel-name]`
+    subscribe [channel-name]
 
-    `send [channel-name] [message]`
+    send [channel-name] [message]
 
-    `unsubscribe [channel-name]`
+    unsubscribe [channel-name]
    
     
