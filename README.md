@@ -28,69 +28,30 @@ This repository contains a simple implementation of Redis Pub/Sub using Node.js 
 ## Folder Structure
 
 
-├── redisNode \
-│   ├── publish \
-│   │   └── publisher.ts \
-│   ├── subscribe \
-│   │   └── subscriber.ts \
+├── src \
+│   └── server.ts \
 ├── package.json \
-├── tsconfig.json \
 └── README.md \
 
 
 ## Running the Code
 
-### Publisher
+### Starting server
 
-The publisher publishes an article message to the Redis channel named `article`.
+    `yarn start -p 3000`
 
-1.  **Navigate to the publish directory:**
+### Connect Websocket to Server
+
+    *in a separate terminal*
     
-    `cd redisNode/publish` 
-    
-2.  **Compile and run the TypeScript file:**
-    
-    `npm start` 
+    `yarn wscat -c ws://localhost:3000/v1/ws`
 
-    * NOTE: Using ~ in a string will be able to specify which channel to publish to. channel~message
+### Commands for Websocket 
 
-### Subscriber
+    `subscribe [channel-name]`
 
-The subscriber listens to the Redis channel named `article` and logs any received messages.
+    `send [channel-name] [message]`
 
-1.  **Navigate to the subscribe directory:**
-    
-    `cd redisNode/subscribe` 
-    
-2.  **Compile and run the TypeScript file:**
-    
-    `npm start`
-
-
-### Publish Message:
-
-1. **To Publish a Message**
-
-   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": 1234, "name": "Hello World!"}'`
-
-
-### Testing:
-
-1.  **Navigate to the subscribe directory:**
-    
-    `cd redisNode/test` 
-    
-2. **Test Clients are being connected**
-
-   `npm run client`
-   
-4. **Test Messages are being Ran**
-
-   `npm run message`
-
-   *Then in a separate console*
-   
-   `curl -X POST http://localhost:3000/publish -H "Content-Type: application/json" -d '{"id": 1234, "name": "Hello World!"}'`
-
+    `unsubscribe [channel-name]`
    
     
