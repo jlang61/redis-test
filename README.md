@@ -8,6 +8,7 @@ This repository contains a simple implementation of Redis Pub/Sub for WebSockets
 -   Node.js (>= 12.x)
 -   Redis server
 -   npm
+-   docker 
 
 ## Setup
 
@@ -22,7 +23,9 @@ This repository contains a simple implementation of Redis Pub/Sub for WebSockets
     
 3.  **Ensure Redis server is running:**
     
-    `redis-server` 
+    `redis-server`
+    OR
+    `docker run -d -p  6379:6379 redis`
     
 
 ## Folder Structure
